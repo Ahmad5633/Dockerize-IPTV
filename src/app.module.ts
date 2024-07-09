@@ -4,6 +4,7 @@ import { DatabaseModule } from './database/database.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { GenreModule } from './genre/genre.module';
+import { SeriesModule } from './series/series.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -13,6 +14,7 @@ import { GenreModule } from './genre/genre.module';
     UserModule,
     AuthModule,
     GenreModule,
+    SeriesModule,
   ],
 })
 export class AppModule {}

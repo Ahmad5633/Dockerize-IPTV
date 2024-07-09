@@ -14,7 +14,7 @@ import { ConnectionOptions } from 'typeorm';
         configService: ConfigService,
       ): Promise<TypeOrmModuleOptions> => {
         const dbConfig: ConnectionOptions = {
-          type: 'postgres', // Adjust this according to your database type
+          type: 'postgres',
           host: configService.get<string>('DB_HOST', 'localhost'),
           port: configService.get<number>('DB_PORT', 5432),
           username: configService.get<string>('DB_USERNAME'),
