@@ -19,26 +19,26 @@ export class SeriesService {
     private readonly fileRepository: Repository<File>,
   ) {}
 
-  async create(createSeriesDto: CreateSeriesDto): Promise<Series> {
-    const { trailer_id, thumbnail_id } = createSeriesDto;
-    try {
-      const trailer = trailer_id
-        ? await this.fileRepository.findOne({ where: { id: trailer_id } })
-        : null;
-      const thumbnail = thumbnail_id
-        ? await this.fileRepository.findOne({ where: { id: thumbnail_id } })
-        : null;
+  // async create(createSeriesDto: CreateSeriesDto): Promise<Series> {
+  //   const { trailer_id, thumbnail_id } = createSeriesDto;
+  //   try {
+  //     const trailer = trailer_id
+  //       ? await this.fileRepository.findOne({ where: { id: trailer_id } })
+  //       : null;
+  //     const thumbnail = thumbnail_id
+  //       ? await this.fileRepository.findOne({ where: { id: thumbnail_id } })
+  //       : null;
 
-      const series = this.seriesRepository.create({
-        ...createSeriesDto,
-        trailer,
-        thumbnail,
-      });
-      return this.seriesRepository.save(series);
-    } catch (error) {
-      throw new InternalServerErrorException('Failed to create series');
-    }
-  }
+  //     const series = this.seriesRepository.create({
+  //       ...createSeriesDto,
+  //       trailer,
+  //       thumbnail,
+  //     });
+  //     return this.seriesRepository.save(series);
+  //   } catch (error) {
+  //     throw new InternalServerErrorException('Failed to create series');
+  //   }
+  // }
 
   async findAll(): Promise<Series[]> {
     try {
@@ -60,25 +60,25 @@ export class SeriesService {
     }
   }
 
-  async update(id: number, updateSeriesDto: UpdateSeriesDto): Promise<Series> {
-    const series = await this.findOne(id);
-    const { trailer_id, thumbnail_id } = updateSeriesDto;
-    try {
-      if (trailer_id)
-        series.trailer = await this.fileRepository.findOne({
-          where: { id: trailer_id },
-        });
-      if (thumbnail_id)
-        series.thumbnail = await this.fileRepository.findOne({
-          where: { id: thumbnail_id },
-        });
+  // async update(id: number, updateSeriesDto: UpdateSeriesDto): Promise<Series> {
+  //   const series = await this.findOne(id);
+  //   const { trailer_id, thumbnail_id } = updateSeriesDto;
+  //   try {
+  //     if (trailer_id)
+  //       series.trailer = await this.fileRepository.findOne({
+  //         where: { id: trailer_id },
+  //       });
+  //     if (thumbnail_id)
+  //       series.thumbnail = await this.fileRepository.findOne({
+  //         where: { id: thumbnail_id },
+  //       });
 
-      this.seriesRepository.merge(series, updateSeriesDto);
-      return this.seriesRepository.save(series);
-    } catch (error) {
-      throw new InternalServerErrorException('Failed to update series');
-    }
-  }
+  //     this.seriesRepository.merge(series, updateSeriesDto);
+  //     return this.seriesRepository.save(series);
+  //   } catch (error) {
+  //     throw new InternalServerErrorException('Failed to update series');
+  //   }
+  // }
 
   async remove(id: number): Promise<void> {
     const series = await this.findOne(id);
