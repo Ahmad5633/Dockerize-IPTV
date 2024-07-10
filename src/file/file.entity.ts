@@ -1,22 +1,26 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Episode } from '../episode/episode.entity';
 
 @Entity()
 export class File {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 255 })
-  original_name: string;
+  @Column()
+  originalName: string;
 
-  @Column({ length: 255 })
-  current_name: string;
+  @Column()
+  currentName: string;
 
-  @Column({ length: 255 })
+  @Column()
   type: string;
 
-  @Column('text')
+  @Column()
   path: string;
 
-  @Column('int')
+  @Column()
   size: number;
+
+  @OneToMany(() => Episode, (episode) => episode.thumbnail)
+  episodes: Episode[];
 }

@@ -22,27 +22,27 @@ export class StreamService {
     return stream;
   }
 
-  async findEpisodeByStreamId(id: number): Promise<any> {
-    const stream = await this.streamRepository.findOne({
-      where: { id },
-      relations: ['episode'],
-    });
-    if (!stream) {
-      throw new NotFoundException('Stream not found');
-    }
-    return stream.episode;
-  }
+  //   async findEpisodeByStreamId(id: number): Promise<any> {
+  //     const stream = await this.streamRepository.findOne({
+  //       where: { id },
+  //       relations: ['episode'],
+  //     });
+  //     if (!stream) {
+  //       throw new NotFoundException('Stream not found');
+  //     }
+  //     return stream.episode;
+  //   }
 
-  async findUserByStreamId(id: number): Promise<any> {
-    const stream = await this.streamRepository.findOne({
-      where: { id },
-      relations: ['user'],
-    });
-    if (!stream) {
-      throw new NotFoundException('Stream not found');
-    }
-    return stream.user;
-  }
+  //   async findUserByStreamId(id: number): Promise<any> {
+  //     const stream = await this.streamRepository.findOne({
+  //       where: { id },
+  //       relations: ['user'],
+  //     });
+  //     if (!stream) {
+  //       throw new NotFoundException('Stream not found');
+  //     }
+  //     return stream.user;
+  //   }
 
   async update(id: number, updateData: Partial<Stream>): Promise<Stream> {
     await this.streamRepository.update(id, updateData);

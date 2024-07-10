@@ -1,33 +1,24 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  BaseEntity,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Episode } from '../episode/episode.entity';
 import { User } from '../user/user.entity';
 
 @Entity()
-export class Stream extends BaseEntity {
+export class Stream {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   episode_id: number;
 
-  @ManyToOne(() => Episode)
-  @JoinColumn({ name: 'episode_id' })
-  episode: Episode;
-
   @Column()
   user_id: number;
 
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
-
   @Column()
   time: string;
+
+  @ManyToOne(() => Episode, (episode) => episode.streams)
+  episode: Episode;
+
+  @ManyToOne(() => User, (user) => user.streams)
+  user: User;
 }

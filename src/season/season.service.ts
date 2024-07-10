@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Season } from './season.entity';
-
+import { Episode } from '../episode/episode.entity';
 @Injectable()
 export class SeasonService {
   constructor(
@@ -31,7 +31,7 @@ export class SeasonService {
       return season;
     } catch (error) {
       if (error instanceof NotFoundException) {
-        throw error; // Re-throw NotFoundException directly
+        throw error;
       } else {
         throw new InternalServerErrorException('Unable to fetch season');
       }
@@ -69,5 +69,13 @@ export class SeasonService {
     } catch (error) {
       throw new InternalServerErrorException('Unable to delete season');
     }
+  }
+
+  async getEpisodesBySeasonId(id: number): Promise<Episode[]> {
+    const season = await this.seasonRepository.findOne({
+      where: { id },
+      relations: ['episodes'],
+    });
+    return season ? season.episodes : [];
   }
 }
