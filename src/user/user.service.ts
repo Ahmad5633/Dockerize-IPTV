@@ -89,7 +89,6 @@ export class UserService {
 
   async getUserStreams(userId: number): Promise<Stream[]> {
     const user = await this.userRepository.findOne({
-      where: { id: userId },
       relations: ['streams'],
     });
     if (!user) {
