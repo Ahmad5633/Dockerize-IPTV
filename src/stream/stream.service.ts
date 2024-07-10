@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Stream } from './stream.entity';
@@ -12,6 +16,15 @@ export class StreamService {
     private readonly streamRepository: Repository<Stream>,
   ) {}
 
+  async create(streamData: Partial<Stream>): Promise<Stream> {
+    try {
+      const newStream = this.streamRepository.create(streamData);
+      await this.streamRepository.save(newStream);
+      return newStream;
+    } catch (error) {
+      throw new InternalServerErrorException('Unable to create stream');
+    }
+  }
   async findAll(): Promise<Stream[]> {
     return this.streamRepository.find();
   }

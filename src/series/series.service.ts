@@ -70,11 +70,24 @@ export class SeriesService {
     }
   }
 
+  // async findSeasonsBySeriesId(seriesId: number): Promise<Season[]> {
+  //   const series = await this.seriesRepository.findOne({
+  //     where: { id: seriesId },
+  //     relations: ['seasons'],
+  //   });
+
+  //   if (!series) {
+  //     throw new NotFoundException('Series not found');
+  //   }
+
+  //   return series.seasons;
+  // }
   async findSeasonsBySeriesId(seriesId: number): Promise<Season[]> {
-    const series = await this.seriesRepository.findOne({
-      where: { id: seriesId },
-      relations: ['seasons'],
-    });
+    const series = await this.seriesRepository
+      .createQueryBuilder('series')
+      .leftJoinAndSelect('series.seasons', 'seasons')
+      .where('series.id = :id', { id: seriesId })
+      .getOne();
 
     if (!series) {
       throw new NotFoundException('Series not found');

@@ -1,18 +1,23 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  try {
-    const app = await NestFactory.create(AppModule);
-    const port = process.env.PORT || 3000;
-    await app.listen(port);
+  const app = await NestFactory.create(AppModule);
 
-    Logger.log(`Application running on port ${port}`);
-  } catch (error) {
-    Logger.error(`Failed to start application`, error.stack);
-    process.exit(1);
-  }
+  const options = new DocumentBuilder()
+    .setTitle('IPTV')
+    .setDescription('BAckend APIs of IPTV')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('api', app, document);
+
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+
+  Logger.log(`Application running on port ${port}`);
 }
 
 bootstrap();

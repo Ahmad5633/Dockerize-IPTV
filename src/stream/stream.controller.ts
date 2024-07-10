@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Post,
   Param,
   Patch,
   Delete,
@@ -15,6 +16,11 @@ import { Season } from 'src/season/season.entity';
 @Controller('streams')
 export class StreamController {
   constructor(private readonly streamService: StreamService) {}
+
+  @Post()
+  async createStream(@Body() streamData: Partial<Stream>): Promise<Stream> {
+    return this.streamService.create(streamData);
+  }
 
   @Get()
   findAll(): Promise<Stream[]> {
