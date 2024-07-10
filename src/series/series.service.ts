@@ -5,40 +5,41 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Series } from '../series/series.entity';
+import { Series } from './series.entity';
 import { CreateSeriesDto } from './dto/create-series.dto';
 import { UpdateSeriesDto } from './dto/update-series.dto';
-import { File } from '../file/file.entity';
+import { Season } from '../season/season.entity';
+import { Episode } from '../episode/episode.entity';
 
 @Injectable()
 export class SeriesService {
   constructor(
     @InjectRepository(Series)
     private readonly seriesRepository: Repository<Series>,
-    @InjectRepository(File)
-    private readonly fileRepository: Repository<File>,
+    @InjectRepository(Season)
+    private readonly seasonRepository: Repository<Season>,
+    @InjectRepository(Episode)
+    private readonly episodeRepository: Repository<Episode>,
   ) {}
 
-  // async create(createSeriesDto: CreateSeriesDto): Promise<Series> {
-  //   const { trailer_id, thumbnail_id } = createSeriesDto;
-  //   try {
-  //     const trailer = trailer_id
-  //       ? await this.fileRepository.findOne({ where: { id: trailer_id } })
-  //       : null;
-  //     const thumbnail = thumbnail_id
-  //       ? await this.fileRepository.findOne({ where: { id: thumbnail_id } })
-  //       : null;
+  async create(createSeriesDto: CreateSeriesDto): Promise<Series> {
+    try {
+      const series = this.seriesRepository.create(createSeriesDto);
+      return this.seriesRepository.save(series);
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to create series');
+    }
+  }
 
-  //     const series = this.seriesRepository.create({
-  //       ...createSeriesDto,
-  //       trailer,
-  //       thumbnail,
-  //     });
-  //     return this.seriesRepository.save(series);
-  //   } catch (error) {
-  //     throw new InternalServerErrorException('Failed to create series');
-  //   }
-  // }
+  async update(id: number, updateSeriesDto: UpdateSeriesDto): Promise<Series> {
+    try {
+      const series = await this.findOne(id);
+      this.seriesRepository.merge(series, updateSeriesDto);
+      return this.seriesRepository.save(series);
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to update series');
+    }
+  }
 
   async findAll(): Promise<Series[]> {
     try {
@@ -60,26 +61,6 @@ export class SeriesService {
     }
   }
 
-  // async update(id: number, updateSeriesDto: UpdateSeriesDto): Promise<Series> {
-  //   const series = await this.findOne(id);
-  //   const { trailer_id, thumbnail_id } = updateSeriesDto;
-  //   try {
-  //     if (trailer_id)
-  //       series.trailer = await this.fileRepository.findOne({
-  //         where: { id: trailer_id },
-  //       });
-  //     if (thumbnail_id)
-  //       series.thumbnail = await this.fileRepository.findOne({
-  //         where: { id: thumbnail_id },
-  //       });
-
-  //     this.seriesRepository.merge(series, updateSeriesDto);
-  //     return this.seriesRepository.save(series);
-  //   } catch (error) {
-  //     throw new InternalServerErrorException('Failed to update series');
-  //   }
-  // }
-
   async remove(id: number): Promise<void> {
     const series = await this.findOne(id);
     try {
@@ -87,5 +68,31 @@ export class SeriesService {
     } catch (error) {
       throw new InternalServerErrorException('Failed to delete series');
     }
+  }
+
+  async findSeasonsBySeriesId(seriesId: number): Promise<Season[]> {
+    const series = await this.seriesRepository.findOne({
+      where: { id: seriesId },
+      relations: ['seasons'],
+    });
+
+    if (!series) {
+      throw new NotFoundException('Series not found');
+    }
+
+    return series.seasons;
+  }
+
+  async findEpisodesBySeriesId(seriesId: number): Promise<Episode[]> {
+    const seasons = await this.seasonRepository.find({
+      where: { series_id: seriesId },
+      relations: ['episodes'],
+    });
+
+    const episodes = seasons.reduce((acc, season) => {
+      return [...acc, ...season.episodes];
+    }, []);
+
+    return episodes;
   }
 }

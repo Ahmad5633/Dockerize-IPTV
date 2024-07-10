@@ -8,6 +8,7 @@ import {
   Delete,
   HttpException,
   HttpStatus,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.entity';
@@ -15,6 +16,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { Stream } from '../stream/stream.entity';
 
 @Controller('users')
 export class UserController {
@@ -78,5 +80,28 @@ export class UserController {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
+  }
+
+  @Get(':id/streams')
+  async getUserStreams(
+    @Param('id', ParseIntPipe) userId: number,
+  ): Promise<Stream[]> {
+    return this.userService.getUserStreams(userId);
+  }
+
+  @Get(':id/streams/:streamId')
+  async getUserStream(
+    @Param('id', ParseIntPipe) userId: number,
+    @Param('streamId', ParseIntPipe) streamId: number,
+  ): Promise<Stream> {
+    return this.userService.getUserStream(userId, streamId);
+  }
+
+  @Delete(':id/streams/:streamId')
+  async deleteUserStream(
+    @Param('id', ParseIntPipe) userId: number,
+    @Param('streamId', ParseIntPipe) streamId: number,
+  ): Promise<void> {
+    await this.userService.deleteUserStream(userId, streamId);
   }
 }
