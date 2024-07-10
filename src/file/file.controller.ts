@@ -12,7 +12,8 @@ import { FileService } from './file.service';
 import { File } from './file.entity';
 import { multerConfig } from './multer.config';
 import { MulterFile } from 'multer';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('File')
 @Controller('files')
 export class FileController {
   constructor(private readonly fileService: FileService) {}

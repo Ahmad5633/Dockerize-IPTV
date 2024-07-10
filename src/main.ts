@@ -8,7 +8,7 @@ async function bootstrap() {
 
   const options = new DocumentBuilder()
     .setTitle('IPTV')
-    .setDescription('BAckend APIs of IPTV')
+    .setDescription('Backend APIs of IPTV')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, options);

@@ -11,7 +11,8 @@ import {
 import { EpisodeService } from './episode.service';
 import { Episode } from './episode.entity';
 import { Stream } from '../stream/stream.entity';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Episode')
 @Controller('episodes')
 export class EpisodeController {
   constructor(private readonly episodeService: EpisodeService) {}

@@ -7,7 +7,8 @@ import {
 } from '@nestjs/common';
 import { ForgetPasswordService } from './forget-password.service';
 import { UpdatePasswordService } from './update-password.service';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Password')
 @Controller('password')
 export class ForgetPasswordController {
   constructor(

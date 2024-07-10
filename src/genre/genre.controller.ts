@@ -15,7 +15,8 @@ import {
 import { GenreService } from './genre.service';
 import { Genre } from './genre.entity';
 import { CreateGenreDto, UpdateGenreDto } from './dto/create-genre.dto';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Genre')
 @Controller('genres')
 export class GenreController {
   constructor(private readonly genreService: GenreService) {}

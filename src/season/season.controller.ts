@@ -11,6 +11,8 @@ import {
 import { SeasonService } from './season.service';
 import { Season } from './season.entity';
 import { Episode } from '../episode/episode.entity';
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Season')
 @Controller('seasons')
 export class SeasonController {
   constructor(private readonly seasonService: SeasonService) {}
