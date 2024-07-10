@@ -16,7 +16,8 @@ import { Season } from 'src/season/season.entity';
 import { SeriesService } from './series.service';
 import { CreateSeriesDto } from './dto/create-series.dto';
 import { UpdateSeriesDto } from './dto/update-series.dto';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Series')
 @Controller('series')
 export class SeriesController {
   constructor(private readonly seriesService: SeriesService) {}

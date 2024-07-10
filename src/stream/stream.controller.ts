@@ -12,8 +12,10 @@ import { StreamService } from './stream.service';
 import { Stream } from './stream.entity';
 import { Episode } from 'src/episode/episode.entity';
 import { Season } from 'src/season/season.entity';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('streams')
+@ApiTags('Streams')
 export class StreamController {
   constructor(private readonly streamService: StreamService) {}
 
