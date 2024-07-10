@@ -16,10 +16,10 @@ import { UpdateSeriesDto } from './dto/update-series.dto';
 export class SeriesController {
   constructor(private readonly seriesService: SeriesService) {}
 
-  @Post()
-  async create(@Body() createSeriesDto: CreateSeriesDto) {
-    return this.seriesService.create(createSeriesDto);
-  }
+  // @Post()
+  // async create(@Body() createSeriesDto: CreateSeriesDto) {
+  //   return this.seriesService.create(createSeriesDto);
+  // }
 
   @Get()
   async findAll() {
@@ -31,13 +31,13 @@ export class SeriesController {
     return this.seriesService.findOne(id);
   }
 
-  @Put(':id')
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateSeriesDto: UpdateSeriesDto,
-  ) {
-    return this.seriesService.update(id, updateSeriesDto);
-  }
+  // @Put(':id')
+  // async update(
+  //   @Param('id', ParseIntPipe) id: number,
+  //   @Body() updateSeriesDto: UpdateSeriesDto,
+  // ) {
+  //   return this.seriesService.update(id, updateSeriesDto);
+  // }
 
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
