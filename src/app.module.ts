@@ -10,6 +10,7 @@ import { SeasonModule } from './season/season.module';
 import { FileModule } from './file/file.module';
 import { StreamModule } from './stream/stream.module';
 import { GenreSeriesModule } from './genre-series/genre-series.module';
+import { ForgetPasswordModule } from './resetPassword/forget-password.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,6 +27,7 @@ import { GenreSeriesModule } from './genre-series/genre-series.module';
     FileModule,
     StreamModule,
     GenreSeriesModule,
+    ForgetPasswordModule,
   ],
 })
 export class AppModule {}

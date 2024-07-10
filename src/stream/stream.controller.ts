@@ -1,6 +1,16 @@
-import { Controller, Get, Param, Patch, Delete, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Delete,
+  Body,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { StreamService } from './stream.service';
 import { Stream } from './stream.entity';
+import { Episode } from 'src/episode/episode.entity';
+import { Season } from 'src/season/season.entity';
 
 @Controller('streams')
 export class StreamController {
@@ -16,16 +26,6 @@ export class StreamController {
     return this.streamService.findOne(+id);
   }
 
-  //   @Get(':id/episode')
-  //   findEpisodeByStreamId(@Param('id') id: string): Promise<any> {
-  //     return this.streamService.findEpisodeByStreamId(+id);
-  //   }
-
-  //   @Get(':id/user')
-  //   findUserByStreamId(@Param('id') id: string): Promise<any> {
-  //     return this.streamService.findUserByStreamId(+id);
-  //   }
-
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -37,5 +37,34 @@ export class StreamController {
   @Delete(':id')
   remove(@Param('id') id: string): Promise<void> {
     return this.streamService.remove(+id);
+  }
+
+  @Get(':id/episode')
+  async getEpisodeByStreamId(
+    @Param('id', ParseIntPipe) streamId: number,
+  ): Promise<Episode> {
+    return this.streamService.findEpisodeByStreamId(streamId);
+  }
+
+  @Get(':id/user')
+  async getUserByStreamId(@Param('id', ParseIntPipe) streamId: number) {
+    return this.streamService.findUserByStreamId(streamId);
+  }
+
+  @Get(':id/episode/season')
+  async getSeasonByEpisodeId(
+    @Param('id', ParseIntPipe) streamId: number,
+  ): Promise<Season> {
+    return this.streamService.findSeasonByEpisodeId(streamId);
+  }
+
+  @Get(':id/episode/season/series')
+  async getSeriesBySeasonId(@Param('id', ParseIntPipe) streamId: number) {
+    return this.streamService.findSeriesBySeasonId(streamId);
+  }
+
+  @Get(':id/episode/season/series/genre')
+  async getGenreBySeriesId(@Param('id', ParseIntPipe) streamId: number) {
+    return this.streamService.findGenreBySeriesId(streamId);
   }
 }
