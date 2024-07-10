@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { EpisodeService } from './episode.service';
 import { Episode } from './episode.entity';
+import { Stream } from '../stream/stream.entity';
 
 @Controller('episodes')
 export class EpisodeController {
@@ -44,5 +45,10 @@ export class EpisodeController {
   async deleteEpisode(@Param('id') id: string): Promise<void> {
     const episodeId = parseInt(id, 10);
     await this.episodeService.delete(episodeId);
+  }
+
+  @Get(':id/streams')
+  async getStreamsByEpisodeId(@Param('id') id: number): Promise<Stream[]> {
+    return this.episodeService.getStreamsByEpisodeId(id);
   }
 }

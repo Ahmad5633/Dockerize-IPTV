@@ -1,4 +1,3 @@
-// season.controller.ts
 import {
   Controller,
   Get,
@@ -11,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { SeasonService } from './season.service';
 import { Season } from './season.entity';
-
+import { Episode } from '../episode/episode.entity';
 @Controller('seasons')
 export class SeasonController {
   constructor(private readonly seasonService: SeasonService) {}
@@ -45,5 +44,10 @@ export class SeasonController {
   async deleteSeason(@Param('id') id: string): Promise<void> {
     const seasonId = parseInt(id, 10);
     await this.seasonService.delete(seasonId);
+  }
+
+  @Get(':id/episodes')
+  async getEpisodesBySeasonId(@Param('id') id: number): Promise<Episode[]> {
+    return this.seasonService.getEpisodesBySeasonId(id);
   }
 }

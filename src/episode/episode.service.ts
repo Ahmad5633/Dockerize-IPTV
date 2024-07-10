@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Episode } from './episode.entity';
+import { Stream } from '../stream/stream.entity';
 
 @Injectable()
 export class EpisodeService {
@@ -31,7 +32,7 @@ export class EpisodeService {
       return episode;
     } catch (error) {
       if (error instanceof NotFoundException) {
-        throw error; // Re-throw NotFoundException directly
+        throw error;
       } else {
         throw new InternalServerErrorException('Unable to fetch episode');
       }
@@ -69,5 +70,13 @@ export class EpisodeService {
     } catch (error) {
       throw new InternalServerErrorException('Unable to delete episode');
     }
+  }
+
+  async getStreamsByEpisodeId(id: number): Promise<Stream[]> {
+    const episode = await this.episodeRepository.findOne({
+      where: { id },
+      relations: ['streams'],
+    });
+    return episode ? episode.streams : [];
   }
 }

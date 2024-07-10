@@ -44,6 +44,7 @@ export class UserController {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
   }
+
   @Get()
   async getAllUsers(): Promise<User[]> {
     try {

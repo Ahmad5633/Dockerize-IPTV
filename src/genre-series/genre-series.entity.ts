@@ -1,17 +1,35 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Series } from '../series/series.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Genre } from '../genre/genre.entity';
+import { Series } from '../series/series.entity';
 
 @Entity()
 export class GenreSeries {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Genre, { eager: true })
-  @JoinColumn({ name: 'genre_id' })
+  @Column()
+  genre_id: number;
+
+  @Column()
+  series_id: number;
+
+  @ManyToOne(() => Genre, (genre) => genre.genreSeries)
   genre: Genre;
 
-  @ManyToOne(() => Series, { eager: true })
-  @JoinColumn({ name: 'series_id' })
+  @ManyToOne(() => Series, (series) => series.genreSeries)
   series: Series;
 }
+
+// import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+
+// @Entity()
+// export class GenreSeries {
+//   @PrimaryGeneratedColumn()
+//   id: number;
+
+//   @Column()
+//   genre_id: number;
+
+//   @Column()
+//   series_id: number;
+// }

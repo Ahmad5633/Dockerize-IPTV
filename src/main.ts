@@ -5,10 +5,6 @@ import { Logger } from '@nestjs/common';
 async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule);
-
-    // Global middleware, pipes, and other configurations can be applied here
-    // Example: app.useGlobalPipes(new ValidationPipe());
-
     const port = process.env.PORT || 3000;
     await app.listen(port);
 

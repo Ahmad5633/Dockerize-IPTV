@@ -16,15 +16,15 @@ export class StreamController {
     return this.streamService.findOne(+id);
   }
 
-  @Get(':id/episode')
-  findEpisodeByStreamId(@Param('id') id: string): Promise<any> {
-    return this.streamService.findEpisodeByStreamId(+id);
-  }
+  //   @Get(':id/episode')
+  //   findEpisodeByStreamId(@Param('id') id: string): Promise<any> {
+  //     return this.streamService.findEpisodeByStreamId(+id);
+  //   }
 
-  @Get(':id/user')
-  findUserByStreamId(@Param('id') id: string): Promise<any> {
-    return this.streamService.findUserByStreamId(+id);
-  }
+  //   @Get(':id/user')
+  //   findUserByStreamId(@Param('id') id: string): Promise<any> {
+  //     return this.streamService.findUserByStreamId(+id);
+  //   }
 
   @Patch(':id')
   update(

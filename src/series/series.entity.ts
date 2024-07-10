@@ -1,28 +1,27 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
-import { File } from '../file/file.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { GenreSeries } from '../genre-series/genre-series.entity';
+import { Season } from '../season/season.entity';
 
 @Entity()
 export class Series {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   name: string;
 
-  @Column('text')
+  @Column({ type: 'text' })
   description: string;
 
-  @ManyToOne(() => File, { eager: true })
-  @JoinColumn({ name: 'trailer_id' })
-  trailer: File;
+  @Column({ type: 'integer' })
+  trailer_id: number;
 
-  @ManyToOne(() => File, { eager: true })
-  @JoinColumn({ name: 'thumbnail_id' })
-  thumbnail: File;
+  @Column({ type: 'integer' })
+  thumbnail_id: number;
+
+  @OneToMany(() => GenreSeries, (genreSeries) => genreSeries.series)
+  genreSeries: GenreSeries[];
+
+  @OneToMany(() => Season, (season) => season.series)
+  seasons: Season[];
 }
