@@ -9,11 +9,14 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Stream } from '../stream/stream.entity';
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Stream)
+    private readonly streamRepository: Repository<Stream>,
   ) {}
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { first_name, last_name, email, password } = createUserDto;
@@ -82,5 +85,41 @@ export class UserService {
     } catch (error) {
       throw new InternalServerErrorException('Error deleting user');
     }
+  }
+
+  async getUserStreams(userId: number): Promise<Stream[]> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['streams'],
+    });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    return user.streams;
+  }
+
+  async getUserStream(userId: number, streamId: number): Promise<Stream> {
+    const stream = await this.streamRepository.findOne({
+      where: { id: streamId, user: { id: userId } },
+      relations: ['user'],
+    });
+    if (!stream) {
+      throw new NotFoundException(
+        `Stream with ID ${streamId} not found for User with ID ${userId}`,
+      );
+    }
+    return stream;
+  }
+
+  async deleteUserStream(userId: number, streamId: number): Promise<void> {
+    const stream = await this.streamRepository.findOne({
+      where: { id: streamId, user: { id: userId } },
+    });
+    if (!stream) {
+      throw new NotFoundException(
+        `Stream with ID ${streamId} not found for User with ID ${userId}`,
+      );
+    }
+    await this.streamRepository.remove(stream);
   }
 }

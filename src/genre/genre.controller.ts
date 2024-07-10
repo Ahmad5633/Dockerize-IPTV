@@ -9,18 +9,22 @@ import {
   ParseIntPipe,
   HttpException,
   HttpStatus,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { GenreService } from './genre.service';
 import { Genre } from './genre.entity';
+import { CreateGenreDto, UpdateGenreDto } from './dto/create-genre.dto';
 
 @Controller('genres')
 export class GenreController {
   constructor(private readonly genreService: GenreService) {}
 
   @Post()
-  async createGenre(@Body() genre: Genre): Promise<Genre> {
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async createGenre(@Body() createGenreDto: CreateGenreDto): Promise<Genre> {
     try {
-      return await this.genreService.createGenre(genre);
+      return await this.genreService.createGenre(createGenreDto);
     } catch (error) {
       throw new HttpException(
         error.message,
@@ -62,9 +66,10 @@ export class GenreController {
   }
 
   @Patch(':id')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
   async updateGenre(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateGenreDto: Partial<Genre>,
+    @Body() updateGenreDto: UpdateGenreDto,
   ): Promise<Genre> {
     try {
       return await this.genreService.updateGenre(id, updateGenreDto);
@@ -82,6 +87,34 @@ export class GenreController {
   async deleteGenre(@Param('id', ParseIntPipe) id: number): Promise<Genre> {
     try {
       return await this.genreService.deleteGenre(id);
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error instanceof HttpException
+          ? error.getStatus()
+          : HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get(':id/series')
+  async getSeriesByGenre(@Param('id', ParseIntPipe) genreId: number) {
+    try {
+      return this.genreService.findSeriesByGenre(genreId);
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error instanceof HttpException
+          ? error.getStatus()
+          : HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get(':id/series/seasons')
+  async getSeasonsByGenre(@Param('id', ParseIntPipe) genreId: number) {
+    try {
+      return this.genreService.findSeasonsByGenre(genreId);
     } catch (error) {
       throw new HttpException(
         error.message,
