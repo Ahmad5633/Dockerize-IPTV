@@ -32,7 +32,7 @@ export class EpisodeService {
       return episode;
     } catch (error) {
       if (error instanceof NotFoundException) {
-        throw error; // Rethrow NotFoundException to propagate it
+        throw error;
       } else {
         throw new InternalServerErrorException('Unable to fetch episode');
       }

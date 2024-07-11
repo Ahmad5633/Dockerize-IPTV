@@ -14,17 +14,11 @@ export class Episode {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // @Column({ type: 'integer' })
-  // season_id: number;
-
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
   @Column({ type: 'text' })
   description: string;
-
-  // @Column({ type: 'integer' })
-  // thumbnail_id: number;
 
   @ManyToOne(() => Season, (season) => season.episodes)
   season: Season;

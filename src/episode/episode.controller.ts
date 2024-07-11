@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   Body,
-  NotFoundException,
 } from '@nestjs/common';
 import { EpisodeService } from './episode.service';
 import { Episode } from './episode.entity';

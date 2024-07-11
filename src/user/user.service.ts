@@ -31,7 +31,6 @@ export class UserService {
       return await this.userRepository.save(user);
     } catch (error) {
       if (error.code === '23505') {
-        // Unique violation
         throw new ConflictException('Email already exists');
       }
       throw new InternalServerErrorException('Could not register user');
