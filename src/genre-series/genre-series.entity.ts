@@ -7,12 +7,6 @@ export class GenreSeries {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  genre_id: number;
-
-  @Column()
-  series_id: number;
-
   @ManyToOne(() => Genre, (genre) => genre.genreSeries)
   genre: Genre;
 

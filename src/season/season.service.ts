@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Season } from './season.entity';
 import { Episode } from '../episode/episode.entity';
+
 @Injectable()
 export class SeasonService {
   constructor(
@@ -72,10 +73,16 @@ export class SeasonService {
   }
 
   async getEpisodesBySeasonId(id: number): Promise<Episode[]> {
-    const season = await this.seasonRepository.findOne({
-      where: { id },
-      relations: ['episodes'],
-    });
-    return season ? season.episodes : [];
+    try {
+      const season = await this.seasonRepository.findOne({
+        where: { id },
+        relations: ['episodes'],
+      });
+      return season ? season.episodes : [];
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Unable to fetch episodes by season',
+      );
+    }
   }
 }
