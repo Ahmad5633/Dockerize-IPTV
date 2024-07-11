@@ -32,7 +32,7 @@ export class EpisodeService {
       return episode;
     } catch (error) {
       if (error instanceof NotFoundException) {
-        throw error;
+        throw error; // Rethrow NotFoundException to propagate it
       } else {
         throw new InternalServerErrorException('Unable to fetch episode');
       }
@@ -73,10 +73,16 @@ export class EpisodeService {
   }
 
   async getStreamsByEpisodeId(id: number): Promise<Stream[]> {
-    const episode = await this.episodeRepository.findOne({
-      where: { id },
-      relations: ['streams'],
-    });
-    return episode ? episode.streams : [];
+    try {
+      const episode = await this.episodeRepository.findOne({
+        where: { id },
+        relations: ['streams'],
+      });
+      return episode ? episode.streams : [];
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Unable to fetch streams for episode',
+      );
+    }
   }
 }

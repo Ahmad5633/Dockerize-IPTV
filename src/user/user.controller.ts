@@ -1,107 +1,117 @@
 import {
   Controller,
   Post,
-  Body,
   Get,
-  Param,
   Patch,
   Delete,
-  HttpException,
-  HttpStatus,
-  ParseIntPipe,
+  Body,
+  Param,
+  Req,
+  UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { User } from './user.entity';
+import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcryptjs';
-import { Stream } from '../stream/stream.entity';
-
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserService } from './user.service';
+@ApiTags('users')
 @Controller('users')
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
-  @Post('register')
+  @Post('registration')
+  @ApiOperation({ summary: 'Register a new user' })
+  @ApiResponse({
+    status: 201,
+    description: 'The user has been successfully created.',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input.' })
   async register(@Body() createUserDto: CreateUserDto) {
-    try {
-      return await this.userService.createUser(createUserDto);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
+    return await this.userService.register(createUserDto);
   }
 
   @Post('login')
+  @ApiOperation({ summary: 'Login a user' })
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully logged in.',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async login(@Body() loginUserDto: LoginUserDto) {
-    const user = await this.userService.findByEmail(loginUserDto.email);
-    if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
-      const payload = { email: user.email, sub: user.id };
-      return {
-        access_token: this.jwtService.sign(payload),
-      };
-    } else {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
-    }
+    return await this.userService.login(loginUserDto);
   }
 
   @Get()
-  async getAllUsers(): Promise<User[]> {
-    try {
-      return await this.userService.getAllUsers();
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiResponse({ status: 200, description: 'Return all users.' })
+  @ApiResponse({ status: 404, description: 'Users not found.' })
+  async findAll() {
+    return await this.userService.findAll();
   }
 
-  @Get('findbyemail/:email')
-  async findUserByEmail(@Param('email') email: string): Promise<User | null> {
-    return await this.userService.findByEmail(email);
-  }
-
-  @Patch(':id')
-  async updateUser(
-    @Param('id') id: number,
-    @Body() updateUserDto: Partial<User>,
-  ): Promise<User> {
-    try {
-      return await this.userService.updateUser(id, updateUserDto);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  @Delete(':id')
-  async deleteUser(@Param('id') id: number): Promise<User> {
-    try {
-      return await this.userService.deleteUser(id);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
-    }
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a user by id' })
+  @ApiResponse({ status: 200, description: 'Return the user.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  async findOne(@Param('id') id: number) {
+    return await this.userService.findOne(id);
   }
 
   @Get(':id/streams')
-  async getUserStreams(
-    @Param('id', ParseIntPipe) userId: number,
-  ): Promise<Stream[]> {
-    return this.userService.getUserStreams(userId);
+  @ApiOperation({ summary: 'Get all streams of a user by user id' })
+  @ApiResponse({ status: 200, description: 'Return all streams of the user.' })
+  @ApiResponse({ status: 404, description: 'User or streams not found.' })
+  async findStreamsByUserId(@Param('id') id: number) {
+    return await this.userService.findStreamsByUserId(id);
   }
 
   @Get(':id/streams/:streamId')
-  async getUserStream(
-    @Param('id', ParseIntPipe) userId: number,
-    @Param('streamId', ParseIntPipe) streamId: number,
-  ): Promise<Stream> {
-    return this.userService.getUserStream(userId, streamId);
+  @ApiOperation({ summary: 'Get a stream of a user by user id and stream id' })
+  @ApiResponse({ status: 200, description: 'Return the stream of the user.' })
+  @ApiResponse({ status: 404, description: 'User or stream not found.' })
+  async findStreamByUserIdAndStreamId(
+    @Param('id') id: number,
+    @Param('streamId') streamId: number,
+  ) {
+    return await this.userService.findStreamByUserIdAndStreamId(id, streamId);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update a user by id' })
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully updated.',
+  })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
+    return await this.userService.update(id, updateUserDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a user by id' })
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully deleted.',
+  })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  async remove(@Param('id') id: number) {
+    return await this.userService.remove(id);
   }
 
   @Delete(':id/streams/:streamId')
-  async deleteUserStream(
-    @Param('id', ParseIntPipe) userId: number,
-    @Param('streamId', ParseIntPipe) streamId: number,
-  ): Promise<void> {
-    await this.userService.deleteUserStream(userId, streamId);
+  @ApiOperation({
+    summary: 'Delete a stream of a user by user id and stream id',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The stream has been successfully deleted.',
+  })
+  @ApiResponse({ status: 404, description: 'User or stream not found.' })
+  async removeStream(
+    @Param('id') id: number,
+    @Param('streamId') streamId: number,
+  ) {
+    return await this.userService.removeUserStream(id, streamId);
   }
 }

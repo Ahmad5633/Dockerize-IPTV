@@ -1,17 +1,24 @@
-import { IsString, IsInt, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsInt, IsArray } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateSeriesDto {
+  @ApiProperty({ example: 'Series Name' })
   @IsString()
+  @IsNotEmpty()
   name: string;
 
+  @ApiProperty({ example: 'Series Description' })
   @IsString()
+  @IsNotEmpty()
   description: string;
 
-  @IsOptional()
+  @ApiProperty({ example: 1 })
   @IsInt()
-  trailer_id?: number;
+  @IsNotEmpty()
+  trailer_id: number;
 
-  @IsOptional()
+  @ApiProperty({ example: 1 })
   @IsInt()
-  thumbnail_id?: number;
+  @IsNotEmpty()
+  thumbnail_id: number;
 }
