@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { File } from './file.entity';
@@ -11,17 +15,29 @@ export class FileService {
   ) {}
 
   async create(file: File): Promise<File> {
-    return await this.fileRepository.save(file);
+    try {
+      return await this.fileRepository.save(file);
+    } catch (error) {
+      throw new InternalServerErrorException('Could not save file');
+    }
   }
 
   async findAll(): Promise<File[]> {
-    return await this.fileRepository.find();
+    try {
+      return await this.fileRepository.find();
+    } catch (error) {
+      throw new InternalServerErrorException('Could not retrieve files');
+    }
   }
 
   async delete(id: number): Promise<void> {
-    const result = await this.fileRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(`File with ID ${id} not found`);
+    try {
+      const result = await this.fileRepository.delete(id);
+      if (result.affected === 0) {
+        throw new NotFoundException(`File with ID ${id} not found`);
+      }
+    } catch (error) {
+      throw new InternalServerErrorException('Could not delete file');
     }
   }
 }

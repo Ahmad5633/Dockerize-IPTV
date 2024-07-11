@@ -22,6 +22,6 @@ export class Series {
   @OneToMany(() => GenreSeries, (genreSeries) => genreSeries.series)
   genreSeries: GenreSeries[];
 
-  @OneToMany(() => Season, (season) => season.series)
+  @OneToMany(() => Season, (season) => season.series, { eager: true })
   seasons: Season[];
 }

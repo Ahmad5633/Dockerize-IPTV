@@ -10,7 +10,8 @@ import {
 } from '@nestjs/common';
 import { GenreSeries } from './genre-series.entity';
 import { GenreSeriesService } from './genre-series.service';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('GenreSeries')
 @Controller('genre-series')
 export class GenreSeriesController {
   constructor(private readonly genreSeriesService: GenreSeriesService) {}

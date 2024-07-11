@@ -18,6 +18,7 @@ export class GenreService {
     @InjectRepository(Series)
     private readonly seriesRepository: Repository<Series>,
   ) {}
+
   async createGenre(createGenreDto: CreateGenreDto): Promise<Genre> {
     try {
       const genre = new Genre();
@@ -39,7 +40,7 @@ export class GenreService {
     }
   }
 
-  async findGenreById(id: number): Promise<Genre | null> {
+  async findGenreById(id: number): Promise<Genre> {
     try {
       const genre = await this.genreRepository.findOne({ where: { id } });
       if (!genre) {
@@ -53,13 +54,11 @@ export class GenreService {
 
   async updateGenre(
     id: number,
-    updateGenreDto: Partial<Genre>,
+    updateGenreDto: UpdateGenreDto,
   ): Promise<Genre> {
     try {
       await this.genreRepository.update(id, updateGenreDto);
-      const updatedGenre = await this.genreRepository.findOne({
-        where: { id },
-      });
+      const updatedGenre = await this.genreRepository.findOneBy({ id });
       if (!updatedGenre) {
         throw new NotFoundException(`Genre with ID ${id} not found`);
       }
@@ -73,8 +72,11 @@ export class GenreService {
   }
 
   async deleteGenre(id: number): Promise<Genre> {
-    const genre = await this.findGenreById(id);
     try {
+      const genre = await this.genreRepository.findOneBy({ id });
+      if (!genre) {
+        throw new NotFoundException(`Genre with ID ${id} not found`);
+      }
       await this.genreRepository.delete(id);
       return genre;
     } catch (error) {
@@ -83,37 +85,45 @@ export class GenreService {
   }
 
   async findSeriesByGenre(genreId: number): Promise<Series[]> {
-    const genre = await this.genreRepository.findOne({
-      where: { id: genreId },
-      relations: ['genreSeries', 'genreSeries.series'],
-    });
+    try {
+      const genre = await this.genreRepository.findOne({
+        where: { id: genreId },
+        relations: ['genreSeries', 'genreSeries.series'],
+      });
 
-    if (!genre) {
-      throw new Error('Genre not found');
+      if (!genre) {
+        throw new NotFoundException('Genre not found');
+      }
+
+      return genre.genreSeries.map((gs) => gs.series);
+    } catch (error) {
+      throw new InternalServerErrorException('Error finding series by genre');
     }
-
-    return genre.genreSeries.map((gs) => gs.series);
   }
 
-  async findSeasonsByGenre(genreId: number) {
-    const genre = await this.genreRepository.findOne({
-      where: { id: genreId },
-      relations: [
-        'genreSeries',
-        'genreSeries.series',
-        'genreSeries.series.seasons',
-      ],
-    });
+  async findSeasonsByGenre(genreId: number): Promise<any[]> {
+    try {
+      const genre = await this.genreRepository.findOne({
+        where: { id: genreId },
+        relations: [
+          'genreSeries',
+          'genreSeries.series',
+          'genreSeries.series.seasons',
+        ],
+      });
 
-    if (!genre) {
-      throw new Error('Genre not found');
+      if (!genre) {
+        throw new NotFoundException('Genre not found');
+      }
+
+      const seriesWithSeasons = genre.genreSeries.map((gs) => ({
+        series: gs.series,
+        seasons: gs.series.seasons,
+      }));
+
+      return seriesWithSeasons;
+    } catch (error) {
+      throw new InternalServerErrorException('Error finding seasons by genre');
     }
-
-    const seriesWithSeasons = genre.genreSeries.map((gs) => ({
-      series: gs.series,
-      seasons: gs.series.seasons,
-    }));
-
-    return seriesWithSeasons;
   }
 }
