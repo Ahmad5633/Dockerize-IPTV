@@ -7,7 +7,6 @@ import {
   Param,
   Body,
   ParseIntPipe,
-  NotFoundException,
 } from '@nestjs/common';
 import { SeriesService } from './series.service';
 import { Series } from './series.entity';

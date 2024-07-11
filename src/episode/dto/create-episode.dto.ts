@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsInt, MinLength, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsInt } from 'class-validator';
 
 export class EpisodeDto {
   @IsInt()
