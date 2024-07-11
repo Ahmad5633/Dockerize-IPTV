@@ -1,6 +1,7 @@
 import {
   Injectable,
   NotFoundException,
+  ConflictException,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,97 +16,92 @@ import { Episode } from '../episode/episode.entity';
 export class SeriesService {
   constructor(
     @InjectRepository(Series)
-    private readonly seriesRepository: Repository<Series>,
+    private seriesRepository: Repository<Series>,
     @InjectRepository(Season)
-    private readonly seasonRepository: Repository<Season>,
-    @InjectRepository(Episode)
-    private readonly episodeRepository: Repository<Episode>,
+    private seasonRepository: Repository<Season>,
   ) {}
 
   async create(createSeriesDto: CreateSeriesDto): Promise<Series> {
     try {
       const series = this.seriesRepository.create(createSeriesDto);
-      return this.seriesRepository.save(series);
+      return await this.seriesRepository.save(series);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to create series');
-    }
-  }
-
-  async update(id: number, updateSeriesDto: UpdateSeriesDto): Promise<Series> {
-    try {
-      const series = await this.findOne(id);
-      this.seriesRepository.merge(series, updateSeriesDto);
-      return this.seriesRepository.save(series);
-    } catch (error) {
-      throw new InternalServerErrorException('Failed to update series');
+      throw new InternalServerErrorException('Could not create series');
     }
   }
 
   async findAll(): Promise<Series[]> {
     try {
-      return this.seriesRepository.find();
+      return await this.seriesRepository.find();
     } catch (error) {
-      throw new InternalServerErrorException('Failed to fetch series');
+      throw new InternalServerErrorException('Could not retrieve series');
     }
   }
 
   async findOne(id: number): Promise<Series> {
     try {
-      const series = await this.seriesRepository.findOne({ where: { id } });
+      const series = await this.seriesRepository.findOneBy({ id });
       if (!series) {
         throw new NotFoundException(`Series with ID ${id} not found`);
       }
       return series;
     } catch (error) {
-      throw new InternalServerErrorException('Failed to fetch series');
+      throw new InternalServerErrorException('Could not retrieve series');
+    }
+  }
+
+  async update(id: number, updateSeriesDto: UpdateSeriesDto): Promise<Series> {
+    try {
+      await this.seriesRepository.update(id, updateSeriesDto);
+      const updatedSeries = await this.seriesRepository.findOneBy({ id });
+      if (!updatedSeries) {
+        throw new NotFoundException(`Series with ID ${id} not found`);
+      }
+      return updatedSeries;
+    } catch (error) {
+      throw new InternalServerErrorException('Could not update series');
     }
   }
 
   async remove(id: number): Promise<void> {
-    const series = await this.findOne(id);
     try {
-      await this.seriesRepository.remove(series);
+      const result = await this.seriesRepository.delete(id);
+      if (result.affected === 0) {
+        throw new NotFoundException(`Series with ID ${id} not found`);
+      }
     } catch (error) {
-      throw new InternalServerErrorException('Failed to delete series');
+      throw new InternalServerErrorException('Could not delete series');
     }
   }
 
-  // async findSeasonsBySeriesId(seriesId: number): Promise<Season[]> {
-  //   const series = await this.seriesRepository.findOne({
-  //     where: { id: seriesId },
-  //     relations: ['seasons'],
-  //   });
-
-  //   if (!series) {
-  //     throw new NotFoundException('Series not found');
-  //   }
-
-  //   return series.seasons;
-  // }
-  async findSeasonsBySeriesId(seriesId: number): Promise<Season[]> {
-    const series = await this.seriesRepository
-      .createQueryBuilder('series')
-      .leftJoinAndSelect('series.seasons', 'seasons')
-      .where('series.id = :id', { id: seriesId })
-      .getOne();
-
-    if (!series) {
-      throw new NotFoundException('Series not found');
+  async getSeasonsBySeriesId(seriesId: number): Promise<Season[]> {
+    try {
+      const seasons = await this.seasonRepository.find({
+        where: { series: { id: seriesId } },
+      });
+      if (seasons.length === 0) {
+        throw new NotFoundException(
+          `No seasons found for series with ID ${seriesId}`,
+        );
+      }
+      return seasons;
+    } catch (error) {
+      throw new InternalServerErrorException('Could not retrieve seasons');
     }
-
-    return series.seasons;
   }
 
-  async findEpisodesBySeriesId(seriesId: number): Promise<Episode[]> {
-    const seasons = await this.seasonRepository.find({
-      where: { series_id: seriesId },
-      relations: ['episodes'],
-    });
-
-    const episodes = seasons.reduce((acc, season) => {
-      return [...acc, ...season.episodes];
-    }, []);
-
-    return episodes;
+  async getEpisodesBySeriesId(seriesId: number): Promise<Episode[]> {
+    try {
+      const series = await this.seriesRepository.findOne({
+        where: { id: seriesId },
+        relations: ['seasons', 'seasons.episodes'],
+      });
+      if (!series) {
+        throw new NotFoundException(`Series with ID ${seriesId} not found`);
+      }
+      return series.seasons.flatMap((season) => season.episodes);
+    } catch (error) {
+      throw new InternalServerErrorException('Could not retrieve episodes');
+    }
   }
 }

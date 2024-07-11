@@ -19,12 +19,9 @@ export class Season {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'integer' })
-  series_id: number;
-
   @ManyToOne(() => Series, (series) => series.seasons)
   series: Series;
 
-  @OneToMany(() => Episode, (episode) => episode.season)
+  @OneToMany(() => Episode, (episode) => episode.season, { eager: true })
   episodes: Episode[];
 }

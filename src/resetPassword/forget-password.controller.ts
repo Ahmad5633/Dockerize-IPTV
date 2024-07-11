@@ -7,7 +7,8 @@ import {
 } from '@nestjs/common';
 import { ForgetPasswordService } from './forget-password.service';
 import { UpdatePasswordService } from './update-password.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+
 @ApiTags('Password')
 @Controller('password')
 export class ForgetPasswordController {
@@ -17,6 +18,14 @@ export class ForgetPasswordController {
   ) {}
 
   @Post('forget')
+  @ApiOperation({ summary: 'Send OTP for password reset' })
+  @ApiBody({
+    schema: {
+      properties: { email: { type: 'string', example: 'user@example.com' } },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'OTP sent successfully' })
+  @ApiResponse({ status: 500, description: 'Failed to send OTP' })
   async sendOtp(@Body() body: { email: string }): Promise<string> {
     const otp = this.forgetPasswordService.generateOtp();
     this.forgetPasswordService.storeOtp(body.email, otp);
@@ -26,7 +35,6 @@ export class ForgetPasswordController {
         body.email,
       );
       if (retrievedOtp) {
-        // Use the OTP
         console.log('Retrieved OTP:', retrievedOtp);
       } else {
         console.log('No OTP found for the provided email.');
@@ -43,6 +51,18 @@ export class ForgetPasswordController {
   }
 
   @Post('update')
+  @ApiOperation({ summary: 'Update password using OTP' })
+  @ApiBody({
+    schema: {
+      properties: {
+        email: { type: 'string', example: 'user@example.com' },
+        otp: { type: 'string', example: '123456' },
+        newPassword: { type: 'string', example: 'newStrongPassword' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Password updated successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid OTP or email' })
   async updatePassword(
     @Body()
     {

@@ -10,16 +10,23 @@ export class User {
   @ApiProperty()
   @Column({ type: 'varchar', length: 255, nullable: false })
   first_name: string;
+
   @ApiProperty()
   @Column({ type: 'varchar', length: 255, nullable: false })
   last_name: string;
+
   @ApiProperty()
   @Column({ type: 'varchar', length: 255, unique: true, nullable: false })
   email: string;
+
   @ApiProperty()
   @Column({ type: 'varchar', length: 255, nullable: false })
   password: string;
-  @ApiProperty()
-  @OneToMany(() => Stream, (stream) => stream.user)
+
+  @ApiProperty({ type: () => [Stream] })
+  @OneToMany(() => Stream, (stream) => stream.user, {
+    eager: true,
+    cascade: true,
+  })
   streams: Stream[];
 }
