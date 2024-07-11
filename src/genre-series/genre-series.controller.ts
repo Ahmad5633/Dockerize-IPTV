@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   Body,
-  NotFoundException,
 } from '@nestjs/common';
 import { GenreSeries } from './genre-series.entity';
 import { GenreSeriesService } from './genre-series.service';

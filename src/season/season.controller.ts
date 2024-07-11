@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   Body,
-  NotFoundException,
   ParseIntPipe,
 } from '@nestjs/common';
 import { SeasonService } from './season.service';
