@@ -6,9 +6,6 @@ import {
   Delete,
   Body,
   Param,
-  Req,
-  UseGuards,
-  NotFoundException,
 } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
